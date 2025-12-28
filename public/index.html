@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Sender</title>
+</head>
+<body>
+
+<h2>Paste URL</h2>
+
+<input type="text" id="url" placeholder="Paste URL here" style="width:300px">
+<button onclick="send()">GO</button>
+
+<h3>Result:</h3>
+<div id="result">Waiting...</div>
+
+<script>
+const userId = Date.now();
+
+function send() {
+  const url = document.getElementById("url").value;
+
+  fetch("/api/send", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ userId, url })
+  });
+
+  document.getElementById("result").innerText = "Sent to admin...";
+}
+
+setInterval(() => {
+  fetch("/api/check?userId=" + userId)
+    .then(res => res.text())
+    .then(text => {
+      if (text !== "waiting") {
+        document.getElementById("result").innerText = text;
+      }
+    });
+}, 3000);
+</script>
+
+</body>
+</html>
