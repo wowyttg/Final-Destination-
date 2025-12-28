@@ -14,29 +14,19 @@
 <div id="result">Waiting...</div>
 
 <script>
-const userId = Date.now();
-
 function send() {
   const url = document.getElementById("url").value;
 
   fetch("/api/send", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ userId, url })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url })
+  })
+  .then(res => res.text())
+  .then(text => {
+    alert("Result from admin:\n\n" + text);
   });
-
-  document.getElementById("result").innerText = "Sent to admin...";
 }
-
-setInterval(() => {
-  fetch("/api/check?userId=" + userId)
-    .then(res => res.text())
-    .then(text => {
-      if (text !== "waiting") {
-        document.getElementById("result").innerText = text;
-      }
-    });
-}, 3000);
 </script>
 
 </body>
