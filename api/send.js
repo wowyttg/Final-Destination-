@@ -1,21 +1,18 @@
-let store = global.store || (global.store = {});
-
 export default async function handler(req, res) {
-  const { userId, url } = req.body;
+  const { url } = req.body;
 
-  store[userId] = "waiting";
-
-  await fetch(
+  const sent = await fetch(
     `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: process.env.GROUP_ID,
-        text: `UserID: ${userId}\nURL: ${url}`
+        text: `URL:\n${url}`
       })
     }
   );
 
-  res.status(200).send("ok");
+  // wait for admin reply manually
+  res.send("Waiting for admin reply. Please refresh later.");
 }
