@@ -1,18 +1,22 @@
 export default async function handler(req, res) {
-  const { url } = req.body;
+  const { userId, url } = req.body;
 
-  const sent = await fetch(
-    `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: process.env.GROUP_ID,
-        text: `URL:\n${url}`
-      })
-    }
-  );
+  await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/set/${userId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`
+    },
+    body: JSON.stringify("waiting")
+  });
 
-  // wait for admin reply manually
-  res.send("Waiting for admin reply. Please refresh later.");
+  await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: process.env.GROUP_ID,
+      text: `UserID: ${userId}\nURL: ${url}`
+    })
+  });
+
+  res.send("ok");
 }
