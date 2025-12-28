@@ -1,6 +1,15 @@
-let store = global.store || (global.store = {});
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const { userId } = req.query;
-  res.send(store[userId] || "waiting");
+
+  const r = await fetch(
+    `${process.env.UPSTASH_REDIS_REST_URL}/get/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`
+      }
+    }
+  );
+
+  const data = await r.json();
+  res.send(data.result || "waiting");
 }
